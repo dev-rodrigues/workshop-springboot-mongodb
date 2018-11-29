@@ -20,28 +20,35 @@ import com.httpsantos.workshopmongo.services.UserService;
 @RestController
 @RequestMapping(value = "/users")
 public class UserResource {
-	
-	@Autowired
-	private UserService	service;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserDTO>> findAll() {
-        List<User> list = service.findAll();
-        List<UserDTO> listDTO = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(listDTO);
-    }
-    
-    @RequestMapping(value="/{id}", method = RequestMethod.GET)
-    public ResponseEntity<UserDTO> findById(@PathVariable String id) { //@PATHVARIABLE -> RECEBE O ID QUE VEM NA URL
-    	User obj = service.findById(id);
-    	return ResponseEntity.ok().body(new UserDTO(obj));
-    }
-    
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<Void> insert(@RequestBody UserDTO objDTO) { 
-    	User obj = service.fromDTO(objDTO);
-    	obj = service.insert(obj);
-    	URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").buildAndExpand(obj.getId()).toUri();
-    	return ResponseEntity.created(uri).build();
-    }
+	@Autowired
+	private UserService service;
+
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<UserDTO>> findAll() {
+		List<User> list = service.findAll();
+		List<UserDTO> listDTO = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
+		return ResponseEntity.ok().body(listDTO);
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<UserDTO> findById(@PathVariable String id) { // @PATHVARIABLE -> RECEBE O ID QUE VEM NA URL
+		User obj = service.findById(id);
+		return ResponseEntity.ok().body(new UserDTO(obj));
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<Void> insert(@RequestBody UserDTO objDTO) {
+		User obj = service.fromDTO(objDTO);
+		obj = service.insert(obj);
+		URI uri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").buildAndExpand(obj.getId())
+				.toUri();
+		return ResponseEntity.created(uri).build();
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> delete(@PathVariable String id) { // @PATHVARIABLE -> RECEBE O ID QUE VEM NA URL
+		service.delete(id);
+		return ResponseEntity.noContent().build(); // retorna 204 -> void
+	}
 }
